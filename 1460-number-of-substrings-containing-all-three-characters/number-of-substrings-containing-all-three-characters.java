@@ -1,20 +1,21 @@
 class Solution {
     public int numberOfSubstrings(String s) {
-        int n = s.length();
-        int[] count = new int[3];
-        int result = 0;
-        int left = 0;
-        
-        for (int right = 0; right < n; right++) {
-            count[s.charAt(right) - 'a']++;
+        char[] ch = s.toCharArray();
+        int[] abc = {-1, -1, -1};
 
-            while (count[0] > 0 && count[1] > 0 && count[2] > 0) {
-                result += n - right;
-                count[s.charAt(left) - 'a']--;
-                left++;
+        int count = 0, right = 0;
+        while (right < ch.length) {
+            abc[ch[right] - 'a'] = right;
+            
+            int min = Integer.MAX_VALUE;
+            for (int i = 0; i < 3; i++) {
+                min = Math.min(min, abc[i]);
             }
+
+            count += (min + 1);
+            right++;
         }
 
-        return result;
+        return count;
     }
 }
