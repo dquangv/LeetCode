@@ -1,18 +1,27 @@
 class Solution {
     public int maximumCount(int[] nums) {
-        int result = 0;
-        int zero = 0;
+        int firstNonNegativeIndex = findFirstGreaterOrEqual(nums, 0);
+        int firstPositiveIndex = findFirstGreaterOrEqual(nums, 1);
 
-        for (int i = 0; i < nums.length; i++) {
-            if (nums[i] <0) {
-                result++;
-            } else if (nums[i] == 0) {
-                zero++;
+        int negatives = firstNonNegativeIndex;
+        int positives = nums.length - firstPositiveIndex;
+
+        return Math.max(negatives, positives);
+    }
+
+    private int findFirstGreaterOrEqual(int[] nums, int target) {
+        int left = 0, right = nums.length;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] >= target) {
+                right = mid;
             } else {
-                break;
+                left = mid + 1;
             }
         }
 
-        return (result > nums.length - result - zero) ? result : nums.length - result - zero;
+        return left;
     }
 }
