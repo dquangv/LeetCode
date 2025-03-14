@@ -1,30 +1,33 @@
 class Solution {
     public int maximumCandies(int[] candies, long k) {
-        int left = 1;
-        int right = (int) 1e7;
-        int result = 0;
+        int maxCandiesPerChild = 0;
+        int left = 0;
+        int right = 1;
 
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            
-            if (isAllocated(candies, k, mid)) {
-                result = mid;
-                left = mid + 1;
+        for (int candyPile : candies) {
+            if (candyPile > right) {
+                right = candyPile;
+            }
+        }
+        
+        right++;
+
+        while (right - left > 1) {
+            int mid = (right + left) / 2;
+            long countChildren = 0;
+
+            for (int candyPile : candies) {
+                countChildren += candyPile / mid;
+            }
+
+            if (countChildren < k) {
+                right = mid;
             } else {
-                right = mid - 1;
+                maxCandiesPerChild = mid;
+                left = mid;
             }
         }
 
-        return result;
-    }
-
-    private boolean isAllocated(int[] candies, long k, int mid) {
-        long count = 0;
-
-        for (int candy : candies) {
-            count += candy / mid;
-        }
-
-        return count >= k;
+        return maxCandiesPerChild;
     }
 }
