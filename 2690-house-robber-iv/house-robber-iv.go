@@ -1,40 +1,31 @@
 func minCapability(nums []int, k int) int {
-    low, high := nums[0], nums[0];
+    f := func(maxCapability int) bool {
+        chosenCount := 0;
 
-    for _, num := range nums {
-        if num < low {
-            low = num
+        for i := 0; i < len(nums); i++ {
+            if nums[i] <= maxCapability {
+                chosenCount += 1;
+                i++;
+            }
         }
-
-        if num > high {
-            high = num
-        }
+        return chosenCount >= k;
     }
-
-    for low < high {
-        mid := (low + high) / 2;
-
-        if canRob(nums, mid, k) {
-            high = mid;
-        } else {
-            low = mid + 1;
-        }
-    }
-
-    return low;
+    
+    return findCapabilityLimit(1e9, f);
 }
 
-func canRob (nums []int, capability int, k int) bool {
-    count, i := 0, 0;
+func findCapabilityLimit(maxSearchValue int, isFeasible func(int) bool) int {
+    left := 0;
+    right := maxSearchValue;
 
-    for i < len(nums) {
-        if nums[i] <= capability {
-            count++;
-            i++;
+    for left < right {
+        mid := left + (right - left) / 2;
+        if !isFeasible(mid) {
+            left = mid + 1;
+        } else {
+            right = mid;
         }
-
-        i++;
     }
-
-    return count >= k;
+    
+    return left;
 }
