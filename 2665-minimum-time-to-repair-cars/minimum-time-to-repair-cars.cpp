@@ -1,39 +1,33 @@
 class Solution {
 public:
-    long long repairCars(vector<int>& ranks, int cars) {
-        sort(ranks.begin(), ranks.end());
-
-        ll left = 1;
-        ll right = (ll)ranks[0] * cars * cars;
-        ll answer = right;
-
-        while (left <= right) {
-            ll mid = left + (right - left) / 2;
-
-            if (canRepair(ranks, cars, mid)) {
-                answer = mid;
-                right = mid - 1;
-            } else {
-                left = mid + 1;
-            }
-        }
-
-        return answer;
-    }
-
-    typedef long long ll;
-
-    bool canRepair(const vector<int>& ranks, int cars, ll time) {
-        ll totalCars = 0;
-
-        for (int r : ranks) {
-            ll carsPerMechanic = sqrt(time / r);
-            totalCars += carsPerMechanic;
-
-            if (totalCars >= cars)
+    inline bool isPossible(long long int time, int cars, vector<int>& ranks) {
+        for (int& it : ranks) {
+            long long int sq_val = time / (long long int)it;
+            long long int n = sqrt(sq_val);
+            
+            cars -= n;
+            if (cars <= 0)
                 return true;
         }
 
-        return totalCars >= cars;
+        return cars <= 0;
+    }
+
+    long long repairCars(vector<int>& ranks, int cars) {
+        long long int start = 0, end = cars;
+        end *= cars;
+        end *= *max_element(ranks.begin(), ranks.end());
+
+        long long int mid, ans = end;
+        while (start <= end) {
+            mid = (end - start) / 2 + start;
+            if (isPossible(mid, cars, ranks)) {
+                ans = mid;
+                end = mid - 1;
+            } else
+                start = mid + 1;
+        }
+
+        return ans;
     }
 };
