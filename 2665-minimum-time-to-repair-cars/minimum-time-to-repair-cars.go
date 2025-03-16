@@ -1,34 +1,24 @@
 func repairCars(ranks []int, cars int) int64 {
-    sort.Ints(ranks);
-    left := int64(1);
-    right := int64(ranks[0]) * int64(cars) * int64 (cars);
-    result := right;
+	cars64 := int64(cars);
 
-    for left <= right {
-        mid := left + (right - left) / 2;
-        
-        if canRepairAll(ranks, cars, mid) {
-            result = mid;
-            right = mid - 1;
-        } else {
-            left = mid + 1;
-        }
-    }
+	left := int64(0);
+	right := int64(ranks[0]) * cars64 * cars64;
 
-    return result;
-}
+	for left < right {
+		mid := left + (right - left) / 2;
+		totalCars := int64(0);
 
-func canRepairAll(ranks []int, cars int, time int64) bool {
-    totalCars := int64(0);
+		for _, r := range ranks {
+			n := int64(math.Sqrt(float64(mid) / float64(r)));
+			totalCars += n;
+		}
 
-    for _, rank:= range ranks {
-        carsPerMechanic := int64(math.Sqrt(float64(time) / float64(rank)));
-        totalCars += carsPerMechanic;
+		if totalCars >= cars64 {
+			right = mid;
+		} else {
+			left = mid + 1;
+		}
+	}
 
-        if totalCars >= int64(cars) {
-            return true;
-        }
-    }
-
-    return totalCars >= int64(cars);
+	return left;
 }
