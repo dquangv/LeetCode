@@ -6,14 +6,14 @@ func minOperations(nums []int) int {
             continue;
         }
 
-        nums[i] ^= 1;
+        nums[i] = 1;
         nums[i+1] ^= 1;
         nums[i+2] ^= 1;
 
         result++;
     }
 
-    if nums[len(nums) - 2] == 0 || nums[len(nums) - 1] == 0 {
+    if nums[len(nums) - 2] + nums[len(nums) - 1] != 2 {
         return -1;
     }
 
