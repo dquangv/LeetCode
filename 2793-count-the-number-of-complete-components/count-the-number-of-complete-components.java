@@ -1,55 +1,45 @@
 class Solution {
     public int countCompleteComponents(int n, int[][] edges) {
-        List<Integer>[] graph = new ArrayList[n];
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+
         for (int i = 0; i < n; i++) {
-            graph[i] = new ArrayList<>();
+            adj.add(new ArrayList<>());
         }
 
         for (int[] edge : edges) {
-            int u = edge[0], v = edge[1];
-            graph[u].add(v);
-            graph[v].add(u);
+            int nodeA = edge[0];
+            int nodeB = edge[1];
+            adj.get(nodeA).add(nodeB);
+            adj.get(nodeB).add(nodeA);
         }
 
-        boolean[] visited = new boolean[n];
-        int completeComponents = 0;
+        int[] visited = new int[n];
+        int count = 0;
 
         for (int i = 0; i < n; i++) {
-            if (!visited[i]) {
-                int[] counts = dfs(graph, visited, i);
-                int nodeCount = counts[0];
-                int edgeCount = counts[1];
+            if (visited[i] == 0) {
+                List<Integer> component = new ArrayList<>();
+                int edgeCount = dfs(i, visited, adj, component);
+                int nodeCount = component.size();
 
-                if (edgeCount == nodeCount * (nodeCount - 1)) {
-                    completeComponents++;
-                }
+                if (nodeCount * (nodeCount - 1) == edgeCount)
+                    count++;
             }
         }
-
-        return completeComponents;
+        
+        return count;
     }
 
-    private int[] dfs(List<Integer>[] graph, boolean[] visited, int node) {
-        Stack<Integer> stack = new Stack<>();
-        stack.push(node);
-        visited[node] = true;
-
-        int nodes = 0;
-        int edges = 0;
-
-        while (!stack.isEmpty()) {
-            int current = stack.pop();
-            nodes++;
-            edges += graph[current].size();
-
-            for (int neighbor : graph[current]) {
-                if (!visited[neighbor]) {
-                    visited[neighbor] = true;
-                    stack.push(neighbor);
-                }
+    public int dfs(int node, int[] visited, ArrayList<ArrayList<Integer>> adj, List<Integer> component) {
+        visited[node] = 1;
+        component.add(node);
+        int edgeCount = 0;
+        for (int neighbor : adj.get(node)) {
+            if (visited[neighbor] == 0) {
+                edgeCount += dfs(neighbor, visited, adj, component);
             }
+            edgeCount++;
         }
-
-        return new int[] { nodes, edges };
+        return edgeCount;
     }
 }
