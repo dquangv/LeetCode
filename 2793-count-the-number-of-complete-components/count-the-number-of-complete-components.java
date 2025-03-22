@@ -26,7 +26,7 @@ class Solution {
                     count++;
             }
         }
-        
+
         return count;
     }
 
@@ -34,12 +34,15 @@ class Solution {
         visited[node] = 1;
         component.add(node);
         int edgeCount = 0;
+
         for (int neighbor : adj.get(node)) {
             if (visited[neighbor] == 0) {
                 edgeCount += dfs(neighbor, visited, adj, component);
             }
+            
             edgeCount++;
         }
+
         return edgeCount;
     }
 }
