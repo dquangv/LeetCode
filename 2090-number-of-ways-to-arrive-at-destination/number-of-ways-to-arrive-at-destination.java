@@ -1,50 +1,70 @@
+class NodeTime implements Comparable<NodeTime> {
+    int node;
+    long time;
+
+    public NodeTime(int node, long time) {
+        this.node = node;
+        this.time = time;
+    }
+
+    @Override
+    public int compareTo(NodeTime other) {
+        return Long.compare(this.time, other.time);
+    }
+}
+
 class Solution {
     public int countPaths(int n, int[][] roads) {
-        int mod = (int) 1e9 + 7;
+        int numEdges = roads.length;
+        ArrayList<ArrayList<NodeTime>> adj = new ArrayList<>();
 
-        List<List<int[]>> adj = new ArrayList<>();
-        
         for (int i = 0; i < n; i++) {
             adj.add(new ArrayList<>());
         }
 
-        for (int[] road : roads) {
-            adj.get(road[0]).add(new int[]{road[1], road[2]});
-            adj.get(road[1]).add(new int[]{road[0], road[2]});
+        for (int i = 0; i < numEdges; i++) {
+            int u = roads[i][0];
+            int v = roads[i][1];
+            int time = roads[i][2];
+
+            adj.get(u).add(new NodeTime(v, time));
+            adj.get(v).add(new NodeTime(u, time));
         }
 
-        long[] dist = new long[n];
-        Arrays.fill(dist, Long.MAX_VALUE);
-        dist[0] = 0;
+        long[] minDist = new long[n];
+        int[] pathCount = new int[n];
 
-        int[] ways = new int[n];
-        ways[0] = 1;
+        Arrays.fill(minDist, (long) 1e18);
+        minDist[0] = 0;
+        pathCount[0] = 1;
 
-        PriorityQueue<long[]> pq = new PriorityQueue<>(Comparator.comparingLong(a -> a[0]));
-        pq.offer(new long[]{0, 0});
+        PriorityQueue<NodeTime> priorityQueue = new PriorityQueue<>();
+        priorityQueue.add(new NodeTime(0, 0));
 
-        while (!pq.isEmpty()) {
-            long[] curr = pq.poll();
-            long currDist = curr[0];
-            int node = (int) curr[1];
+        int MOD = (int) (1e9 + 7);
 
-            if (currDist > dist[node]) continue;
+        while (!priorityQueue.isEmpty()) {
+            NodeTime current = priorityQueue.poll();
+            int currentNode = current.node;
+            long currentTime = current.time;
 
-            for (int[] neighbor : adj.get(node)) {
-                int nextNode = neighbor[0];
-                long time = neighbor[1];
-                long newDist = currDist + time;
+            if (currentTime > minDist[currentNode])
+                continue;
 
-                if (newDist < dist[nextNode]) {
-                    dist[nextNode] = newDist;
-                    ways[nextNode] = ways[node];
-                    pq.offer(new long[]{newDist, nextNode});
-                } else if (newDist == dist[nextNode]) {
-                    ways[nextNode] = (ways[nextNode] + ways[node]) % mod;
+            for (NodeTime neighbor : adj.get(currentNode)) {
+                int nextNode = neighbor.node;
+                long edgeTime = neighbor.time;
+
+                if (minDist[nextNode] > currentTime + edgeTime) {
+                    minDist[nextNode] = currentTime + edgeTime;
+                    priorityQueue.add(new NodeTime(nextNode, minDist[nextNode]));
+                    pathCount[nextNode] = pathCount[currentNode];
+                } else if (minDist[nextNode] == currentTime + edgeTime) {
+                    pathCount[nextNode] = (pathCount[nextNode] + pathCount[currentNode]) % MOD;
                 }
             }
         }
 
-        return ways[n-1];
+        return pathCount[n - 1];
     }
 }
