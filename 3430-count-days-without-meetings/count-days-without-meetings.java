@@ -1,39 +1,21 @@
 class Solution {
     public int countDays(int days, int[][] meetings) {
-        int freeDays = days;
-        TreeMap<Integer, Integer> meetingDays = new TreeMap<>();
-        
-        for (int[] meeting : meetings) {
-            int start = meeting[0];
-            int end = meeting[1];
-            int overlapDays = 0;
+        Arrays.sort(meetings, (a, b) -> (a[0] - b[0]));
+        int freeDaysAfterFirstMeeting = meetings[0][0] - 1, end = meetings[0][1];
 
-            Map.Entry<Integer, Integer> previousMeetingDays = meetingDays.floorEntry(start);
-            if (previousMeetingDays != null && previousMeetingDays.getValue() >= start - 1) {
-                if (previousMeetingDays.getValue() >= end) continue;
-                overlapDays = previousMeetingDays.getValue() - previousMeetingDays.getKey() + 1;
-                start = previousMeetingDays.getKey();
+        for (int indx = 1; indx < meetings.length; indx++) {
+            int start = meetings[indx][0];
+
+            if (start > end) {
+                freeDaysAfterFirstMeeting += (start - end - 1);
             }
 
-            Map.Entry<Integer, Integer> nextMeetingDays = meetingDays.ceilingEntry(start + 1);
-            while (nextMeetingDays != null && nextMeetingDays.getKey() <= end + 1) {
-                meetingDays.remove(nextMeetingDays.getKey());
-                overlapDays += nextMeetingDays.getValue() - nextMeetingDays.getKey() + 1;
-
-                if (nextMeetingDays.getValue() >= end) {
-                    end = nextMeetingDays.getValue();
-                    break;
-                }
-
-                nextMeetingDays = meetingDays.ceilingEntry(start + 1);
-            }
-
-            meetingDays.put(start, end);
-            freeDays -= (end - start + 1) - overlapDays;
-
-            if (freeDays == 0) break;
+            end = Math.max(end, meetings[indx][1]);
         }
 
-        return freeDays;
+        if (end < days)
+            return days - end + freeDaysAfterFirstMeeting;
+
+        return freeDaysAfterFirstMeeting;
     }
 }
