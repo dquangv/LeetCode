@@ -1,28 +1,39 @@
 class Solution {
     public int countDays(int days, int[][] meetings) {
-        Arrays.sort(meetings, (a, b) -> Integer.compare(a[0], b[0]));
-
-        long busyDays = 0, preStart = -1, preEnd = -1;
-
+        int freeDays = days;
+        TreeMap<Integer, Integer> meetingDays = new TreeMap<>();
+        
         for (int[] meeting : meetings) {
-            int start = meeting[0], end = meeting[1];
+            int start = meeting[0];
+            int end = meeting[1];
+            int overlapDays = 0;
 
-            if (preEnd < start) {
-                if (preStart != -1) {
-                    busyDays += preEnd - preStart + 1;
+            Map.Entry<Integer, Integer> previousMeetingDays = meetingDays.floorEntry(start);
+            if (previousMeetingDays != null && previousMeetingDays.getValue() >= start - 1) {
+                if (previousMeetingDays.getValue() >= end) continue;
+                overlapDays = previousMeetingDays.getValue() - previousMeetingDays.getKey() + 1;
+                start = previousMeetingDays.getKey();
+            }
+
+            Map.Entry<Integer, Integer> nextMeetingDays = meetingDays.ceilingEntry(start + 1);
+            while (nextMeetingDays != null && nextMeetingDays.getKey() <= end + 1) {
+                meetingDays.remove(nextMeetingDays.getKey());
+                overlapDays += nextMeetingDays.getValue() - nextMeetingDays.getKey() + 1;
+
+                if (nextMeetingDays.getValue() >= end) {
+                    end = nextMeetingDays.getValue();
+                    break;
                 }
 
-                preStart = start;
-                preEnd = end;
-            } else {
-                preEnd = Math.max(preEnd, end);
+                nextMeetingDays = meetingDays.ceilingEntry(start + 1);
             }
+
+            meetingDays.put(start, end);
+            freeDays -= (end - start + 1) - overlapDays;
+
+            if (freeDays == 0) break;
         }
 
-        if (preStart != -1) {
-            busyDays += preEnd - preStart + 1;
-        }
-
-        return days - (int) busyDays;
+        return freeDays;
     }
 }
