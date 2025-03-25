@@ -1,29 +1,29 @@
 func checkValidCuts(n int, rectangles [][]int) bool {
-	x := make([][]int, len(rectangles))
-	y := make([][]int, len(rectangles))
 
-	for i := range rectangles {
-		x[i] = []int{rectangles[i][0], rectangles[i][2]}
-		y[i] = []int{rectangles[i][1], rectangles[i][3]}
-	}
+    for k := range 2 {
 
-	return checkNotOverlap(x) || checkNotOverlap(y)
-}
+        sort.Slice(rectangles, func(i, j int) bool {
+            return rectangles[i][k] < rectangles[j][k];
+        })
 
-func checkNotOverlap(rectangles [][]int) bool {
-	sort.Slice(rectangles, func(i, j int) bool {
-		return rectangles[i][0] < rectangles[j][0]
-	})
+        var first bool;
 
-	sections := 0
-	maxEnd := rectangles[0][1]
+        end := rectangles[0][k + 2];
 
-	for _, rect := range rectangles {
-		if maxEnd <= rect[0] {
-			sections++
-		}
-		maxEnd = max(maxEnd, rect[1])
-	}
+        for _, rect := range rectangles {
 
-	return sections >= 2
+            if rect[k] >= end {
+                if first {
+                    return true;
+                }
+
+                first = true;
+            }
+
+            end = max(end, rect[k + 2]);
+        }
+
+    }
+
+    return false;
 }
