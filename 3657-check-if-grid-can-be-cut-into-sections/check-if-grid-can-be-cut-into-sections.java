@@ -17,6 +17,7 @@ class Solution {
 
                     first = true;
                 }
+                
                 end = Math.max(end, rect[k + 2]);
             }
         }
