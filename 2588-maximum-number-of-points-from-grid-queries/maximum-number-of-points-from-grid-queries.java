@@ -1,48 +1,72 @@
 class Solution {
+    public static final int[][] DIRECTIONS = {
+            { 1, 0 },
+            { -1, 0 },
+            { 0, 1 },
+            { 0, -1 },
+    };
+
     public int[] maxPoints(int[][] grid, int[] queries) {
-        int m = grid.length, n = grid[0].length;
-        int k = queries.length;
-        int[] result = new int[k];
+        int queryCount = queries.length;
+        int[] result = new int[queryCount];
+        int rowCount = grid.length;
+        int colCount = grid[0].length;
 
-        int[][] queryIndex = new int[k][2];
-        for (int i = 0; i < k; i++) {
-            queryIndex[i][0] = queries[i];
-            queryIndex[i][1] = i;
+        int totalCells = rowCount * colCount;
+        int[] maxPointsForThreshold = new int[totalCells + 1];
+
+        int[][] minValueToReach = new int[rowCount][colCount];
+
+        for (int[] row : minValueToReach) {
+            Arrays.fill(row, Integer.MAX_VALUE);
         }
-        Arrays.sort(queryIndex, Comparator.comparingInt(a -> a[0]));
+        minValueToReach[0][0] = grid[0][0];
 
-        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
-        pq.offer(new int[]{grid[0][0], 0, 0});
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a[2], b[2]));
+        minHeap.offer(new int[] { 0, 0, grid[0][0] });
+        int visitedCells = 0;
 
-        boolean[][] visited = new boolean[m][n];
-        visited[0][0] = true;
+        while (!minHeap.isEmpty()) {
+            int[] current = minHeap.poll();
 
-        int[][] dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            maxPointsForThreshold[++visitedCells] = current[2];
+            for (int[] direction : DIRECTIONS) {
+                int newRow = current[0] + direction[0];
+                int newCol = current[1] + direction[1];
 
-        int count = 0;
-        int index = 0;
+                if (newRow >= 0 &&
+                        newRow < rowCount &&
+                        newCol >= 0 &&
+                        newCol < colCount &&
+                        minValueToReach[newRow][newCol] == Integer.MAX_VALUE) {
+                    minValueToReach[newRow][newCol] = Math.max(
+                            current[2],
+                            grid[newRow][newCol]);
 
-        while (index < k) {
-            int queryValue = queryIndex[index][0];
-            int queryIdx = queryIndex[index][1];
+                    minHeap.offer(
+                            new int[] {
+                                    newRow,
+                                    newCol,
+                                    minValueToReach[newRow][newCol],
+                            });
+                }
+            }
+        }
 
-            while (!pq.isEmpty() && pq.peek()[0] < queryValue) {
-                int[] cell = pq.poll();
-                int val = cell[0], r = cell[1], c = cell[2];
+        for (int i = 0; i < queryCount; i++) {
+            int threshold = queries[i];
+            int left = 0, right = totalCells;
 
-                count++;
-
-                for (int[] d : dirs) {
-                    int nr = r + d[0], nc = c + d[1];
-                    if (nr >= 0 && nr < m && nc >= 0 && nc < n && !visited[nr][nc]) {
-                        visited[nr][nc] = true;
-                        pq.offer(new int[]{grid[nr][nc], nr, nc});
-                    }
+            while (left < right) {
+                int mid = (left + right + 1) >>> 1;
+                if (maxPointsForThreshold[mid] < threshold) {
+                    left = mid;
+                } else {
+                    right = mid - 1;
                 }
             }
 
-            result[queryIdx] = count;
-            index++;
+            result[i] = left;
         }
 
         return result;
