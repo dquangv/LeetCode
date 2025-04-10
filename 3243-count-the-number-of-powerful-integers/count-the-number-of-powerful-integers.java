@@ -1,28 +1,40 @@
 class Solution {
     // Time Limit Exceeded (start = 123456, finish = 32486458654, limit = 4, s = "1")
 
-    // public long numberOfPowerfulInt(long start, long finish, int limit, String s) {
-    //     long suffix = Long.parseLong(s);
+    public long numberOfPowerfulInt(long start, long finish, int limit, String s) {
+        long suffix = Long.parseLong(s);
 
-    //     if (finish < suffix)
-    //         return 0;
+        if (finish < suffix)
+            return 0;
 
-    //     int lengthSuf = s.length();
-    //     long powerOfTen = (long) Math.pow(10, lengthSuf);
-    //     long prefixFinish = (long) finish / powerOfTen;
-    //     long result = 0;
+        int lengthSuf = s.length();
+        long powerOfTen = (long) Math.pow(10, lengthSuf);
 
-    //     for (long i = 0; i <= prefixFinish; i++) {
-    //         if (isValidPrefix(i, limit)) {
-    //             long power = powerOfTen * i + suffix;
+        long prefixStart = start / powerOfTen;
+        long prefixFinish = finish / powerOfTen;
 
-    //             if (power >= start && power <= finish)
-    //                 result++;
-    //         }
-    //     }
+        // long result = 0;
 
-    //     return result;
-    // }
+        // for (long i = 0; i <= prefixFinish; i++) {
+        //     if (isValidPrefix(i, limit)) {
+        //         long power = powerOfTen * i + suffix;
+
+        //         if (power > finish) break;
+
+        //         if (power >= start && power <= finish)
+        //             result++;
+        //     }
+        // }
+
+        // return result;
+
+        if (start % powerOfTen > suffix)
+            prefixStart++;
+        if (finish % powerOfTen >= suffix)
+            prefixFinish++;
+
+        return countValidPrefixes(prefixFinish, limit) - countValidPrefixes(prefixStart, limit);
+    }
 
     // private boolean isValidPrefix(long prefix, int limit) {
     //     while (prefix != 0) {
@@ -36,31 +48,28 @@ class Solution {
     //     return true;
     // }
 
-    public long numberOfPowerfulInt(long start, long finish, int limit, String s) {
-        return count(finish, limit, s) - count(start - 1, limit, s);
-    }
+    private long countValidPrefixes(long num, int limit) {
+        if (num == 0)
+            return 0;
+        if (limit == 9)
+            return num; // tất cả số đều hợp lệ
 
-    private long count(long maxVal, int limit, String suffix) {
-        String maxStr = Long.toString(maxVal);
-        int preLen = maxStr.length() - suffix.length();
+        int numDigits = (int) Math.log10(num); // số chữ số - 1
+        long divisor = (long) Math.pow(10, numDigits);
+        long result = 0;
 
-        if (preLen < 0) return 0;
+        for (int i = numDigits; i >= 0; i--) {
+            int digit = (int) (num / divisor);
 
-        long[][] dp = new long[preLen + 1][2];
-        dp[preLen][0] = 1;
-        dp[preLen][1] = maxStr.substring(preLen).compareTo(suffix) >= 0 ? 1 : 0;
+            if (digit > limit)
+                return result + (long) Math.pow(limit + 1, i + 1); // tất cả tổ hợp còn lại hợp lệ
 
-        for (int i = preLen - 1; i >= 0; i--) {
-            int digit = maxStr.charAt(i) - '0';
-            dp[i][0] = (limit + 1) * dp[i + 1][0];
+            result += digit * (long) Math.pow(limit + 1, i); // cộng số tổ hợp nhỏ hơn digit tại vị trí này
 
-            if (digit <= limit) {
-                dp[i][1] = (long) digit * dp[i + 1][0] + dp[i + 1][1];
-            } else {
-                dp[i][1] = (long) (limit + 1) * dp[i + 1][0];
-            }
+            num %= divisor;
+            divisor /= 10;
         }
 
-        return dp[0][1];
+        return result;
     }
 }
