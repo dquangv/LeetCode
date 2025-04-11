@@ -3,19 +3,18 @@ class Solution {
         int result = 0;
 
         for (int i = low; i <= high; i++) {
-            String s = String.valueOf(i);
-            int n = s.length();
+            if (i < 100 && i % 10 == i / 10) {
+                result++;
+            } else if (i > 999) {
+                int d1 = i / 1000;
+                int d2 = (i / 100) % 10;
+                int d3 = (i / 10) % 10;
+                int d4 = i % 10;
 
-            if (n % 2 != 0) continue;
-
-            int half = n / 2, sum1 = 0, sum2 = 0;
-
-            for (int j = 0; j < half; j++) {
-                sum1 += s.charAt(j);
-                sum2 += s.charAt(j + half);
+                if (d1 + d2 == d3 + d4) {
+                    result++;
+                }
             }
-
-            if (sum1 == sum2) result++;
         }
 
         return result;
