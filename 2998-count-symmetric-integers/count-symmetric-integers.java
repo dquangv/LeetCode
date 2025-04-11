@@ -1,35 +1,23 @@
 class Solution {
     public int countSymmetricIntegers(int low, int high) {
-        int count = 0;
+        int result = 0;
+
         for (int i = low; i <= high; i++) {
-            int digits = numDigits(i);
-            if (digits % 2 == 0 && isSymmetric(i, digits)) {
-                count++;
+            String s = String.valueOf(i);
+            int n = s.length();
+
+            if (n % 2 != 0) continue;
+
+            int half = n / 2, sum1 = 0, sum2 = 0;
+
+            for (int j = 0; j < half; j++) {
+                sum1 += s.charAt(j);
+                sum2 += s.charAt(j + half);
             }
+
+            if (sum1 == sum2) result++;
         }
 
-        return count;
-    }
-
-    private boolean isSymmetric(int num, int digits) {
-        int half = digits / 2;
-        int sum1 = 0, sum2 = 0;
-        int x = num;
-
-        for (int i = 0; i < half; i++) {
-            sum1 += x % 10;
-            x /= 10;
-        }
-
-        for (int i = 0; i < half; i++) {
-            sum2 += x % 10;
-            x /= 10;
-        }
-
-        return sum1 == sum2;
-    }
-
-    private int numDigits(int num) {
-        return (int) Math.log10(num) + 1;
+        return result;
     }
 }
