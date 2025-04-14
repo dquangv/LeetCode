@@ -9,11 +9,11 @@ class Solution {
 
             result = Math.max(result, heightOfContainer * widthOfContainer);
 
-            if (height[left] < height[right]) {
+            while (left <= right && height[left] <= heightOfContainer)
                 left++;
-            } else {
+
+            while (left <= right && height[right] <= heightOfContainer)
                 right--;
-            }
         }
 
         return result;
