@@ -1,70 +1,58 @@
-class SegmentTree {
-    int n;
-    int[] tree;
-
-    public SegmentTree(int size) {
-        this.n = size;
-        this.tree = new int[4 * size];
-    }
-
-    private void update(int idx, int l, int r, int pos, int val) {
-        if (l == r) {
-            tree[idx] += val;
-            return;
-        }
-        
-        int mid = (l + r) / 2;
-        if (pos <= mid) {
-            update(2 * idx, l, mid, pos, val);
-        } else {
-            update(2 * idx + 1, mid + 1, r, pos, val);
-        }
-
-        tree[idx] = tree[2 * idx] + tree[2 * idx + 1];
-    }
-
-    private int query(int idx, int l, int r, int ql, int qr) {
-        if (qr < l || r < ql) return 0;
-        if (ql <= l && r <= qr) return tree[idx];
-        int mid = (l + r) / 2;
-
-        return query(2 * idx, l, mid, ql, qr) + query(2 * idx + 1, mid + 1, r, ql, qr);
-    }
-
-    public void add(int pos, int val) {
-        update(1, 0, n - 1, pos, val);
-    }
-
-    public int sum(int pos) {
-        return query(1, 0, n - 1, 0, pos);
-    }
-}
-
-public class Solution {
+class Solution {
     public long goodTriplets(int[] nums1, int[] nums2) {
         int n = nums1.length;
+        int[] pos2 = new int[n];
+        int[] mapping = new int[n];
 
-        int[] id2 = new int[n];
+        // Tạo ánh xạ từ số -> vị trí trong nums2
         for (int i = 0; i < n; i++) {
-            id2[nums2[i]] = i;
+            pos2[nums2[i]] = i;
         }
 
-        int[] inv = new int[n];
+        // Tạo mảng vị trí nums1 theo thứ tự nums2
         for (int i = 0; i < n; i++) {
-            inv[id2[nums1[i]]] = i;
+            mapping[pos2[nums1[i]]] = i;
         }
 
-        SegmentTree tree = new SegmentTree(n);
-        long ans = 0;
+        FenwickTree tree = new FenwickTree(n);
+        long result = 0;
 
-        for (int x = 0; x < n; x++) {
-            int pos = inv[x];
-            long L = tree.sum(pos);
-            tree.add(pos, 1);
-            long R = (n - 1 - pos) - (x - L);
-            ans += L * R;
+        for (int value = 0; value < n; value++) {
+            int pos = mapping[value];
+
+            int left = tree.query(pos); // Đếm số phần tử bên trái nhỏ hơn pos
+            tree.update(pos, 1);        // Đánh dấu phần tử đã xuất hiện
+
+            int right = (n - 1 - pos) - (value - left); // Số phần tử hợp lệ bên phải
+            result += (long) left * right;
         }
 
-        return ans;
+        return result;
+    }
+
+    private class FenwickTree {
+        int[] tree;
+
+        public FenwickTree(int size) {
+            tree = new int[size + 1];
+        }
+
+        public void update(int index, int delta) {
+            index++;
+            while (index < tree.length) {
+                tree[index] += delta;
+                index += index & -index;
+            }
+        }
+
+        public int query(int index) {
+            index++;
+            int sum = 0;
+            while (index > 0) {
+                sum += tree[index];
+                index -= index & -index;
+            }
+            return sum;
+        }
     }
 }
