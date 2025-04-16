@@ -1,5 +1,7 @@
 class Solution {
     public long countGood(int[] nums, int k) {
+        if (nums.length < 2) return 0L;
+        
         Map<Integer, Integer> freq = new HashMap<>();
         int n = nums.length, left = 0;
         long pairs = 0, result = 0;
