@@ -1,13 +1,16 @@
 class Solution {
     public int countPairs(int[] nums, int k) {
-        int result = 0, n = nums.length;
+        return recursion(nums, k, 0);
+    }
 
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = i + 1; j < n; j++) {
-                if (nums[i] == nums[j] && (i * j) % k == 0) result++;
-            }
+    public int recursion(int[] nums, int k, int i) {
+        if (i == nums.length - 1) return 0;
+
+        int count = 0;
+        for (int j = i + 1; j < nums.length; j++) {
+            if (nums[i] == nums[j] && (i * j) % k == 0) count++; 
         }
 
-        return result;
+        return count + recursion(nums, k, i + 1);
     }
 }
