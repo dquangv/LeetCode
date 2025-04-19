@@ -13,8 +13,7 @@ class Solution {
             int sum = nums[left] + nums[right];
             
             if (sum < x) {
-                result += (right - left);
-                left++;
+                result += right - left++;
             } else right--;
         }
 
