@@ -1,15 +1,17 @@
 func numRabbits(answers []int) int {
-    countMap := make(map[int]int);
+    maxArr := make(map[int]int);
 	result := 0;
 
     for _, ans := range answers {
-		countMap[ans]++;
-	}
+		maxArr[ans]++;
 
-    for ans, count := range countMap {
-		groupSize := ans + 1;
-		numGroups := (count + groupSize - 1) / groupSize;
-		result += numGroups * groupSize;
+        if maxArr[ans] == 1 {
+            result += ans + 1;
+        }
+
+        if maxArr[ans] == ans + 1 {
+            maxArr[ans] = 0;
+        }
 	}
 
     return result;
