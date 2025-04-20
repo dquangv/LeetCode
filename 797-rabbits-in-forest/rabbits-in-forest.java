@@ -4,18 +4,8 @@ class Solution {
         int result = 0;
 
         for (int ans : answers) {
-            maxArr[ans]++;
-        }
-
-        boolean[] check = new boolean[1001];
-
-        for (int i = 0; i < 1001; i++) {
-            if (maxArr[i] > 0 && !check[i]) {
-                int groupSize = i + 1;
-                int numGroups = (maxArr[i] + groupSize - 1) / groupSize;
-                result += numGroups * groupSize;
-                check[i] = true;
-            }
+            if (++maxArr[ans] == 1) result += ans + 1;
+            if (maxArr[ans] == ans + 1) maxArr[ans] = 0;
         }
 
         return result;
