@@ -1,41 +1,70 @@
 class Solution {
+
     static final int MOD = 1_000_000_007;
-    int[][] comb; // combination table
+    static final int MAX_NUM = 10010;
+    static final int MAX_EXP = 15; // max số mũ trong phân tích nguyên tố
+    static int[][] comb = new int[MAX_NUM + MAX_EXP][MAX_EXP + 1];
+    static int[] smallestPrime = new int[MAX_NUM];
+    static List<Integer>[] primeExponents = new List[MAX_NUM]; // mũ của thừa số nguyên tố
 
-    public int idealArrays(int n, int maxValue) {
-        // max length of sequences starting with a number can't exceed log2(maxValue)
-        int maxLen = 14; // Because 2^14 > 10^4
+    public Solution() {
+        // Đảm bảo chỉ init 1 lần
+        if (comb[0][0] == 1) return;
 
-        // Step 1: Tính tổ hợp C[n][k] để chọn vị trí
-        comb = new int[n + 1][maxLen + 1];
-        for (int i = 0; i <= n; i++) {
-            comb[i][0] = 1;
-            for (int j = 1; j <= maxLen && j <= i; j++) {
-                comb[i][j] = (comb[i - 1][j] + comb[i - 1][j - 1]) % MOD;
-            }
+        // Khởi tạo danh sách
+        for (int i = 0; i < MAX_NUM; i++) {
+            primeExponents[i] = new ArrayList<>();
         }
 
-        // Step 2: dp[length][value]: số chuỗi bắt đầu từ value có độ dài length
-        int[][] dp = new int[maxLen + 1][maxValue + 1];
-        for (int i = 1; i <= maxValue; i++)
-            dp[1][i] = 1;
-
-        for (int len = 2; len <= maxLen; len++) {
-            for (int i = 1; i <= maxValue; i++) {
-                for (int mult = 2 * i; mult <= maxValue; mult += i) {
-                    dp[len][mult] = (dp[len][mult] + dp[len - 1][i]) % MOD;
+        // Sàng Eratosthenes để tìm thừa số nguyên tố nhỏ nhất của mỗi số
+        for (int i = 2; i < MAX_NUM; i++) {
+            if (smallestPrime[i] == 0) {
+                for (int j = i; j < MAX_NUM; j += i) {
+                    if (smallestPrime[j] == 0) {
+                        smallestPrime[j] = i;
+                    }
                 }
             }
         }
 
-        // Step 3: Tính tổng tất cả các cách
-        long res = 0;
-        for (int len = 1; len <= maxLen; len++) {
-            for (int i = 1; i <= maxValue; i++) {
-                res = (res + ((long) dp[len][i] * comb[n - 1][len - 1]) % MOD) % MOD;
+        // Phân tích thừa số nguyên tố mỗi số và lưu mũ các thừa số
+        for (int i = 2; i < MAX_NUM; i++) {
+            int x = i;
+            while (x > 1) {
+                int p = smallestPrime[x], count = 0;
+                while (x % p == 0) {
+                    x /= p;
+                    count++;
+                }
+                primeExponents[i].add(count);
             }
         }
-        
-        return (int) res;
+
+        // Tiền xử lý tổ hợp: C(n, k)
+        comb[0][0] = 1;
+        for (int i = 1; i < MAX_NUM + MAX_EXP; i++) {
+            comb[i][0] = 1;
+            for (int j = 1; j <= Math.min(i, MAX_EXP); j++) {
+                comb[i][j] = (comb[i - 1][j] + comb[i - 1][j - 1]) % MOD;
+            }
+        }
+    }
+
+    public int idealArrays(int length, int maxValue) {
+        long totalWays = 0;
+
+        for (int num = 1; num <= maxValue; num++) {
+            long ways = 1;
+
+            // Với mỗi số num, xét các mũ thừa số nguyên tố của nó
+            for (int exponent : primeExponents[num]) {
+                // Số cách phân phối exponent vào length vị trí
+                ways = (ways * comb[length + exponent - 1][exponent]) % MOD;
+            }
+
+            totalWays = (totalWays + ways) % MOD;
+        }
+
+        return (int) totalWays;
     }
 }
