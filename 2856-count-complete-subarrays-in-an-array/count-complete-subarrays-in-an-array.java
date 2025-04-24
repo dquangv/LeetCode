@@ -1,25 +1,30 @@
 class Solution {
     public int countCompleteSubarrays(int[] nums) {
-        int n = nums.length;
-
-        // Đếm số lượng phần tử phân biệt trong toàn mảng
-        Set<Integer> totalSet = new HashSet<>();
-        for (int num : nums) {
-            totalSet.add(num);
+        Set<Integer> distinctSet = new HashSet<>();
+        for (int val : nums) {
+            distinctSet.add(val); // Tập hợp tất cả giá trị khác nhau
         }
-        int totalDistinct = totalSet.size();
 
+        int totalUnique = distinctSet.size(); // Tổng số phần tử khác nhau
+        int left = 0;
+        int right = 0;
         int count = 0;
 
-        for (int i = 0; i < n; i++) {
-            Set<Integer> subSet = new HashSet<>();
-            for (int j = i; j < n; j++) {
-                subSet.add(nums[j]);
-                if (subSet.size() == totalDistinct) {
-                    count += (n - j); // Tối ưu hóa: những cái sau j chắc chắn là complete luôn
-                    break;
+        Map<Integer, Integer> windowFreq = new HashMap<>();
+
+        while (right < nums.length) {
+            windowFreq.put(nums[right], windowFreq.getOrDefault(nums[right], 0) + 1);
+
+            while (windowFreq.size() == totalUnique) {
+                count += (nums.length - right); // Mỗi subarray bắt đầu từ left đến right, mở rộng đến cuối đều hợp lệ
+
+                windowFreq.put(nums[left], windowFreq.get(nums[left]) - 1);
+                if (windowFreq.get(nums[left]) == 0) {
+                    windowFreq.remove(nums[left]);
                 }
+                left++;
             }
+            right++;
         }
 
         return count;
