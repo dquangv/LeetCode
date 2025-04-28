@@ -8,8 +8,7 @@ class Solution {
             sum += nums[right];
 
             while (left <= right && sum * (right - left + 1) >= k) {
-                sum -= nums[left];
-                left++;
+                sum -= nums[left++];
             }
 
             result += (right - left + 1);
