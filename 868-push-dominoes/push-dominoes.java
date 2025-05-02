@@ -1,35 +1,40 @@
 class Solution {
     public String pushDominoes(String dominoes) {
-        int n = dominoes.length();
-        int[] forces = new int[n];
+        char[] arr = dominoes.toCharArray();
+        int n = arr.length;
+        int lastR = -1; // lưu vị trí domino 'R' gần nhất
 
-        int force = 0;
-        // Left to right: apply force from 'R'
         for (int i = 0; i < n; i++) {
-            if (dominoes.charAt(i) == 'R') force = n;
-            else if (dominoes.charAt(i) == 'L') force = 0;
-            else force = Math.max(force - 1, 0);
+            if (arr[i] == 'L') {
+                if (lastR == -1) {
+                    // không có R trước đó, tất cả trước L => L
+                    for (int j = i - 1; j >= 0 && arr[j] == '.'; --j)
+                        arr[j] = 'L';
+                } else {
+                    // có đoạn 'R...L' => xử lý đối xứng
+                    int left = i - 1, right = lastR + 1;
+                    // trường hợp có 1 dominoes ở giữa chịu lực L và R cân bằng thì trường hợp đó là right = left (không chạy vòng lặp) => giữ nguyên '.'
+                    while (right < left) {
+                        arr[right++] = 'R';
+                        arr[left--] = 'L';
+                    }
 
-            forces[i] += force;
+                    // reset sau khi xử lý xong
+                    lastR = -1;
+                }
+            } else if (arr[i] == 'R') {
+                if (lastR != -1) 
+                    // trường hợp 2 R liên tiếp thì toàn bộ '.' ở giữa đều R
+                    for (int j = lastR + 1; j < i; ++j) arr[j] = 'R';
+
+                // cập nhật vị trí R gần nhất
+                lastR = i;
+            }
         }
 
-        force = 0;
-        // Right to left: apply force from 'L'
-        for (int i = n - 1; i >= 0; i--) {
-            if (dominoes.charAt(i) == 'L') force = n;
-            else if (dominoes.charAt(i) == 'R') force = 0;
-            else force = Math.max(force - 1, 0);
+        // trường hợp vẫn còn 1 'R' chưa xử lý sau khi duyệt hết
+        if (lastR != -1) for (int j = lastR + 1; j < n; j++) arr[j] = 'R';
 
-            forces[i] -= force;
-        }
-
-        StringBuilder result = new StringBuilder();
-        for (int f : forces) {
-            if (f > 0) result.append('R');
-            else if (f < 0) result.append('L');
-            else result.append('.');
-        }
-
-        return result.toString();
+        return new String(arr);
     }
 }
