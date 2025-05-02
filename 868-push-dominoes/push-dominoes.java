@@ -1,40 +1,43 @@
 class Solution {
     public String pushDominoes(String dominoes) {
-        char[] arr = dominoes.toCharArray();
-        int n = arr.length;
-        int lastR = -1; // lưu vị trí domino 'R' gần nhất
+        int rightPointer = -1;
+        int standCount = 0;
 
-        for (int i = 0; i < n; i++) {
-            if (arr[i] == 'L') {
-                if (lastR == -1) {
-                    // không có R trước đó, tất cả trước L => L
-                    for (int j = i - 1; j >= 0 && arr[j] == '.'; --j)
-                        arr[j] = 'L';
-                } else {
-                    // có đoạn 'R...L' => xử lý đối xứng
-                    int left = i - 1, right = lastR + 1;
-                    // trường hợp có 1 dominoes ở giữa chịu lực L và R cân bằng thì trường hợp đó là right = left (không chạy vòng lặp) => giữ nguyên '.'
-                    while (right < left) {
-                        arr[right++] = 'R';
-                        arr[left--] = 'L';
+        char[] result = dominoes.toCharArray();
+
+        for (int i = 0; i < dominoes.length(); i++) {
+            char c = dominoes.charAt(i);
+
+            if (c == '.') {
+                standCount++;
+                if (rightPointer >= 0) {
+                    result[i] = 'R';
+                }
+            } else if (c == 'L') {
+                if (rightPointer >= 0) {
+                    for (int j = 0; j < standCount / 2; j++) {
+                        result[i - j - 1] = 'L';
+                        result[rightPointer + j + 1] = 'R';
                     }
 
-                    // reset sau khi xử lý xong
-                    lastR = -1;
-                }
-            } else if (arr[i] == 'R') {
-                if (lastR != -1) 
-                    // trường hợp 2 R liên tiếp thì toàn bộ '.' ở giữa đều R
-                    for (int j = lastR + 1; j < i; ++j) arr[j] = 'R';
+                    if (standCount % 2 == 1) {
+                        result[rightPointer + standCount / 2 + 1] = '.';
+                    }
 
-                // cập nhật vị trí R gần nhất
-                lastR = i;
+                    standCount = 0;
+                } else {
+                    for (int j = 1; j <= standCount; j++) {
+                        result[i - j] = 'L';
+                    }
+                    standCount = 0;
+                }
+                rightPointer = -1;
+            } else if (c == 'R') {
+                rightPointer = i;
+                standCount = 0;
             }
         }
 
-        // trường hợp vẫn còn 1 'R' chưa xử lý sau khi duyệt hết
-        if (lastR != -1) for (int j = lastR + 1; j < n; j++) arr[j] = 'R';
-
-        return new String(arr);
+        return new String(result);
     }
 }
