@@ -1,6 +1,6 @@
 class Solution {
 
-    private int helper(int[] tops, int[] bottoms, int val) {
+    private int check(int[] tops, int[] bottoms, int val) {
         int top_res = 0, bottom_res = 0;
 
         for (int i = 0; i < tops.length; i++) {
@@ -16,10 +16,10 @@ class Solution {
     }
 
     public int minDominoRotations(int[] tops, int[] bottoms) {
-        int result = helper(tops, bottoms, tops[0]);
+        int result = check(tops, bottoms, tops[0]);
 
         if (result != -1 || tops[0] == bottoms[0]) return result;
 
-        return helper(tops, bottoms, bottoms[0]);
+        return check(tops, bottoms, bottoms[0]);
     }
 }
