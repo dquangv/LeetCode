@@ -1,12 +1,19 @@
 class Solution {
     public int searchInsert(int[] nums, int target) {
-        if (nums[0] > target) return 0;
+        int left = 0, right = nums.length - 1;
 
-        int i;
-        for (i = 0; i < nums.length; i ++) {
-            if (nums[i] >= target) return i;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] == target) {
+                return mid; // Found exact match
+            } else if (nums[mid] < target) {
+                left = mid + 1; // Move right
+            } else {
+                right = mid - 1; // Move left
+            }
         }
 
-        return nums.length;
+        return left; // left is the correct insertion point
     }
 }
