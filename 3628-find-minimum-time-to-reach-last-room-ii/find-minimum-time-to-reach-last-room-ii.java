@@ -1,61 +1,52 @@
 class Solution {
-    static class Node implements Comparable<Node> {
-        long time;
-        int x, y;
-        int dec; // 0 or 1
+    // 4 possible directions: right, down, left, up
+    private static final int[][] DIRS = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
+    private int m; // number of rows
+    private int n; // number of columns
 
-        Node(long time, int x, int y, int dec) {
-            this.time = time;
-            this.x = x;
-            this.y = y;
-            this.dec = dec;
-        }
-
-        @Override
-        public int compareTo(Node other) {
-            return Long.compare(this.time, other.time);
-        }
+    public int minTimeToReach(int[][] moveTime) {
+        m = moveTime.length;
+        n = moveTime[0].length;
+        return dijkstra(moveTime);
     }
 
-    public int minTimeToReach(int[][] g) {
-        int n = g.length;
-        int m = g[0].length;
-        long INF = (long) 1e15;
+    private int dijkstra(int[][] moveTime) {
+        // Priority queue based on the current time (min-heap)
+        Queue<int[]> heap = new PriorityQueue<>((a, b) -> a[1] - b[1]);
 
-        long[][] dist = new long[n][m];
-        for (int i = 0; i < n; i++) Arrays.fill(dist[i], INF);
-        dist[0][0] = 0;
+        // Each element is {position index, current time, odd/even state}
+        heap.offer(new int[] { 0, 0, 1 }); // Start from (0,0) with time 0 and odd (1-step move)
+        moveTime[0][0] = -1; // Mark start cell as visited
 
-        int[] dx = {1, -1, 0, 0};
-        int[] dy = {0, 0, 1, -1};
+        while (!heap.isEmpty()) {
+            int[] curr = heap.poll();
+            int r = curr[0] / n; // row index
+            int c = curr[0] % n; // column index
+            int time = curr[1];
+            int odd = curr[2]; // odd = 1 means next move takes 1 time unit, even = 2
 
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        pq.offer(new Node(0, 0, 0, 0)); // time, x, y, dec
+            for (int[] dir : DIRS) {
+                int rr = r + dir[0];
+                int cc = c + dir[1];
+                int nextNode = rr * n + cc; // flatten index for position
 
-        while (!pq.isEmpty()) {
-            Node cur = pq.poll();
-            long d = cur.time;
-            int x = cur.x, y = cur.y, dec = cur.dec;
-
-            if (dist[x][y] < d) continue;
-            if (x == n - 1 && y == m - 1) return (int) d;
-
-            int nextDec = dec == 0 ? 1 : 0;
-            long extra = dec == 0 ? 1 : 2;
-
-            for (int i = 0; i < 4; i++) {
-                int xn = x + dx[i];
-                int yn = y + dy[i];
-                if (xn >= 0 && xn < n && yn >= 0 && yn < m) {
-                    long nextTime = Math.max(d + extra, g[xn][yn] + extra);
-                    if (nextTime < dist[xn][yn]) {
-                        dist[xn][yn] = nextTime;
-                        pq.offer(new Node(nextTime, xn, yn, nextDec));
-                    }
+                if (!isValid(rr, cc) || moveTime[rr][cc] == -1) {
+                    continue; // Skip out-of-bound or already visited cells
                 }
+
+                int newTime = Math.max(time, moveTime[rr][cc]) + odd; // wait if needed
+                if (rr == m - 1 && cc == n - 1) {
+                    return newTime; // Reached target cell
+                }
+
+                heap.offer(new int[] { nextNode, newTime, 3 - odd }); // toggle between 1 and 2
+                moveTime[rr][cc] = -1; // Mark visited
             }
         }
+        return -1; // Destination not reachable
+    }
 
-        return -1;
+    private boolean isValid(int r, int c) {
+        return r >= 0 && r < m && c >= 0 && c < n;
     }
 }
