@@ -1,7 +1,7 @@
 class Solution {
     public int lengthAfterTransformations(String s, int t) {
         int MOD = (int)1e9 + 7; // Dùng để lấy phần dư tránh tràn số
-        int ans = 0;            // Biến lưu kết quả cuối cùng
+        int result = 0;
 
         // Mảng đếm số lần xuất hiện của các ký tự 'a' đến 'z'
         long[] count = new long[26];
@@ -25,12 +25,12 @@ class Solution {
 
         // Cộng tổng tất cả các ký tự sau khi biến đổi trọn vẹn từng chu kỳ 26
         for (int i = 0; i < 26; i++)
-            ans = (int)((ans + count[i]) % MOD);
+            result = (int)((result + count[i]) % MOD);
 
         // Nếu còn dư t < 26 bước chưa xử lý, ta chỉ cộng phần ảnh hưởng
         for (int i = 26 - t; i < 26; i++)
-            ans = (int)((ans + count[i]) % MOD);
+            result = (int)((result + count[i]) % MOD);
 
-        return ans;
+        return result;
     }
 }
