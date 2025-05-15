@@ -1,5 +1,7 @@
 class Solution {
     public List<String> getLongestSubsequence(String[] words, int[] groups) {
+        if (words.length == 0) return new ArrayList<>();
+        
         List<String> result = new ArrayList<>();
         result.add(words[0]);
         int flag = groups[0];
