@@ -3,16 +3,12 @@ class Solution {
         int low = 0, mid = 0, high = nums.length - 1;
 
         while (mid <= high) {
-            if (nums[mid] == 0) {
-                swap(nums, low, mid);
-                low++;
+            if (nums[mid] == 0)
+                swap(nums, low++, mid++);
+            else if (nums[mid] == 1)
                 mid++;
-            } else if (nums[mid] == 1)
-                mid++;
-            else {
-                swap(nums, mid, high);
-                high--;
-            }
+            else
+                swap(nums, mid, high--);
         }
     }
 
