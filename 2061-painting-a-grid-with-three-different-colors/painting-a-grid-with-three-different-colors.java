@@ -12,6 +12,7 @@ class Solution {
         int[][] I = new int[sz][sz];
         for (int i = 0; i < sz; i++)
             I[i][i] = 1;
+            
         return I;
     }
 
@@ -27,6 +28,7 @@ class Solution {
                 }
             }
         }
+
         return C;
     }
 
@@ -39,6 +41,7 @@ class Solution {
             if (((n >> i) & 1) != 0)
                 ans = multiply(ans, M);
         }
+
         return ans;
     }
 
@@ -50,6 +53,7 @@ class Solution {
             if (((n >> i) & 1) != 0)
                 ans = ans * b % MOD;
         }
+
         return (int)ans;
     }
 
@@ -63,6 +67,7 @@ class Solution {
             i0++;
             return;
         }
+
         for (char x = '0'; x <= '2'; x++) {
             if (x == pattern.charAt(pattern.length() - 1)) continue;
             pattern.append(x);
@@ -73,9 +78,9 @@ class Solution {
 
     void findTypeId(String col, int colIndex) {
         char x = col.charAt(0), y = col.charAt(1), z = 0;
-        for (char c : new char[] {'a', 'b', 'c'}) {
+        for (char c : new char[] {'a', 'b', 'c'}) 
             if (c != x && c != y) z = c;
-        }
+        
         int[] f = new int[128];
         f[x] = 0; f[y] = 1; f[z] = 2;
         int key = 0;
@@ -90,6 +95,7 @@ class Solution {
             findTypeId(curr.toString(), colIndex);
             return;
         }
+
         for (char x = 'a'; x <= 'c'; x++) {
             if (x == (char)('a' + col0.charAt(i) - '0')) continue;
             if (curr.length() > 0 && x == curr.charAt(curr.length() - 1)) continue;
@@ -126,6 +132,7 @@ class Solution {
             for (int v : A[i]) rowSum = (rowSum + v) % MOD;
             ans = (ans + 6L * rowSum % MOD) % MOD;
         }
+
         return (int)ans;
     }
 }
