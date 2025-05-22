@@ -20,9 +20,9 @@ class Solution {
             dec += cntQ[i];
 
             // Thêm các truy vấn bắt đầu tại i vào heap
-            for (int r : qEnd[i]) {
+            for (int r : qEnd[i]) 
                 pq.offer(r);
-            }
+            
 
             int x = nums[i];
             // Dùng các truy vấn trong heap để giảm nums[i] về 0
