@@ -2,11 +2,8 @@ class Solution {
     public int longestPalindrome(String[] words) {
         int[][] count = new int[26][26];
 
-        for (String word : words) {
-            int a = word.charAt(0) - 'a';
-            int b = word.charAt(1) - 'a';
-            count[a][b]++;
-        }
+        for (String word : words)
+            count[word.charAt(0) - 'a'][word.charAt(1) - 'a']++;
 
         int length = 0;
         boolean hasCenter = false;
