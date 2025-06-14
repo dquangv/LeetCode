@@ -1,28 +1,54 @@
 class Solution {
-    public int minMaxDifference(int num) {
-        String s = Integer.toString(num);
+    private int difference(int num) {
+        int firstNonNine = -1, firstDigit = -1;
+        int remaining = num;
 
-        // Tìm ký tự đầu tiên khác '9' để thay thế nhằm tạo số lớn nhất
-        int i = 0;
-        while (i < s.length() - 1 && s.charAt(i) == '9') 
-            i++;
+        // Vòng lặp tìm chữ số đầu tiên khác 9 và chữ số đầu tiên của số
+        while (remaining > 0) {
+            int digit = remaining % 10;
 
-        char toReplaceMax = s.charAt(i);
-        StringBuilder maxStr = new StringBuilder();
-        for (char ch : s.toCharArray())
-            if (ch == toReplaceMax) 
-                maxStr.append('9');
-            else 
-                maxStr.append(ch);
-
-        char toReplaceMin = s.charAt(0);
-        StringBuilder minStr = new StringBuilder();
-        for (char ch : s.toCharArray()) 
-            if (ch == toReplaceMin) 
-                minStr.append('0');
-            else 
-                minStr.append(ch);
+            // Ghi lại chữ số đầu tiên khác 9 (dùng để tạo số max)
+            if (digit != 9) 
+                firstNonNine = digit;
             
-        return Integer.parseInt(maxStr.toString()) - Integer.parseInt(minStr.toString());
+            // Ghi lại chữ số đầu tiên từ phải sang (dùng để tạo số min)
+            firstDigit = digit;
+
+            remaining /= 10;
+        }
+
+        // Reset lại để bắt đầu tạo số mới
+        remaining = num;
+        int min = 0, max = 0;
+        int multiplier = 1;
+
+        // Duyệt từng chữ số để tạo số min và max
+        while (remaining > 0) {
+            int digit = remaining % 10;
+
+            int minDigit = digit;
+            int maxDigit = digit;
+
+            // Nếu digit là chữ số đầu tiên → thay bằng 0 để tạo số nhỏ nhất
+            if (digit == firstDigit) 
+                minDigit = 0;
+
+            // Nếu digit là chữ số đầu tiên khác 9 → thay bằng 9 để tạo số lớn nhất
+            if (digit == firstNonNine) 
+                maxDigit = 9;
+
+            // Cộng giá trị vào kết quả
+            min += multiplier * minDigit;
+            max += multiplier * maxDigit;
+
+            multiplier *= 10;
+            remaining /= 10;
+        }
+
+        return max - min;
+    }
+
+    public int minMaxDifference(int num) {
+        return difference(num);
     }
 }
