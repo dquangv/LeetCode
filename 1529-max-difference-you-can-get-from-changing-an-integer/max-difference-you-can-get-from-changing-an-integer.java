@@ -1,46 +1,63 @@
 class Solution {
+    private int difference(int num) {
+        // Các biến để xác định chữ số đầu tiên không phải 9, không phải 1, và chữ số đầu tiên
+        int firstNonNine = -1, firstNonOne = -1, firstDigit = -1;
+        int remaining = num;
+
+        // Lặp qua các chữ số của num (từ phải sang trái)
+        while (remaining > 0) {
+            int digit = remaining % 10;
+
+            // Tìm chữ số đầu tiên khác 9 (dùng để tạo max)
+            if (digit != 9)
+                firstNonNine = digit;
+
+            // Tìm chữ số đầu tiên > 1 (dùng để tạo min khi chữ số đầu tiên là 1)
+            if (digit > 1)
+                firstNonOne = digit;
+
+            // Cập nhật chữ số đầu tiên (bên trái nhất)
+            firstDigit = digit;
+
+            remaining /= 10;
+        }
+
+        // Reset lại num để xử lý
+        remaining = num;
+        int min = 0, max = 0;
+        int multiplier = 1;
+
+        // Duyệt lại từng chữ số từ phải sang trái để tạo min và max
+        while (remaining > 0) {
+            int digit = remaining % 10;
+            int minDigit = digit;
+            int maxDigit = digit;
+
+            // Logic tạo min:
+            // Nếu chữ số đầu tiên là 1 → thay firstNonOne bằng 0
+            if (firstDigit == 1 && digit == firstNonOne)
+                minDigit = 0;
+
+            // Nếu chữ số đầu tiên không phải 1 → thay nó bằng 1
+            if (firstDigit != 1 && digit == firstDigit)
+                minDigit = 1;
+
+            // Logic tạo max: thay firstNonNine thành 9
+            if (digit == firstNonNine)
+                maxDigit = 9;
+
+            // Cộng dồn vào min và max theo từng hàng
+            min += multiplier * minDigit;
+            max += multiplier * maxDigit;
+
+            multiplier *= 10;
+            remaining /= 10;
+        }
+
+        return max - min;
+    }
+
     public int maxDiff(int num) {
-        String str1 = String.valueOf(num); // Chuyển số sang chuỗi để thao tác thay thế
-        String str2 = str1;
-        int n = str1.length();
-
-        // Tìm chữ số đầu tiên khác '9' trong str1 để thay thành '9' (tạo số lớn nhất có thể)
-        int i = 0;
-        while (i < n && str1.charAt(i) == '9')
-            i++;
-
-        // Nếu có chữ số khác '9', thì thay toàn bộ nó thành '9'
-        char ele1 = i < n ? str1.charAt(i) : ' ';
-        StringBuilder sb1 = new StringBuilder();
-        for (int k = 0; k < n; k++)
-            if (str1.charAt(k) == ele1)
-                sb1.append('9'); // thay ele1 thành 9
-            else
-                sb1.append(str1.charAt(k));
-
-        // Tạo số nhỏ nhất có thể: thay chữ số đầu tiên (thường là chữ số đầu tiên) bằng '1' hoặc các chữ số khác thành '0'
-        char ele2 = str2.charAt(0); // chữ số đầu tiên
-        char replace = '1';
-
-        if (ele2 == '1')
-            // Nếu chữ số đầu tiên đã là '1', tìm chữ số khác 0 và 1 để thay bằng 0
-            for (int k = 1; k < n; k++) {
-                char ch = str2.charAt(k);
-                if (ch != '0' && ch != '1') {
-                    ele2 = ch;
-                    replace = '0';
-                    break;
-                }
-            }
-
-        StringBuilder sb2 = new StringBuilder();
-        for (int k = 0; k < n; k++)
-            if (str2.charAt(k) == ele2)
-                sb2.append(replace); // thay ele2 thành 1 hoặc 0 tùy trường hợp
-            else
-                sb2.append(str2.charAt(k));
-
-        // Trả về hiệu giữa giá trị lớn nhất và nhỏ nhất
-        return Integer.parseInt(sb1.toString()) - Integer.parseInt(sb2.toString());
+        return difference(num);
     }
 }
