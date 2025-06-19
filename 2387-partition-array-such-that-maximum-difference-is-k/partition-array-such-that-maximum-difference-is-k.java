@@ -1,19 +1,22 @@
 class Solution {
     public int partitionArray(int[] nums, int k) {
-        Arrays.sort(nums);
+        int[] freq = new int[(int) (Math.pow(10, 5) + 1)];
+        int max = 0, result = 0;
 
-        int result = 0, i = 0;
-
-        while (i < nums.length) {
-            int start = nums[i]; // Bắt đầu subsequence mới từ phần tử hiện tại
-            result++; // Tăng số subsequence lên
-
-            // Duyệt tiếp các phần tử cho đến khi chênh lệch vượt quá k
-            // Tất cả phần tử thỏa điều kiện max - min <= k sẽ nằm trong cùng một subsequence
-            while (i < nums.length && nums[i] - start <= k)
-                i++;
+        for (int num : nums) {
+            freq[num]++;
+            max = Math.max(max, num);
         }
 
-        return result;
+        for (int i = 0; i <= max; i++)
+            if (freq[i] > 0) {
+                result++; // Mỗi lần gặp phần tử chưa được phân nhóm => tạo 1 subsequence mới
+                i += k;
+                /* Vì subsequence chỉ chứa các phần tử có hiệu max - min <= k,
+                nên ta bỏ qua k phần tử tiếp theo (i += k)
+                Điều này đảm bảo các subsequence không chồng lấn nhau theo điều kiện đã cho */
+            }
+
+        return result; // Trả về tổng số subsequence
     }
 }
