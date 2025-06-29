@@ -36,7 +36,6 @@ class Solution {
                 left = mid + 1; // tiếp tục tìm bên phải
             else
                 right = mid - 1; // thu hẹp bên trái
-
         }
         return left; // trả về chỉ số đầu tiên mà nums[i] > target
     }
