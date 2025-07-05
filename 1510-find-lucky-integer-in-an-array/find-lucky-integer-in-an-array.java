@@ -7,12 +7,11 @@ class Solution {
             max = Math.max(arr[i], max);
         }
 
-        for (int i = max; i > 0; i--) {
+        for (int i = max; i > 0; i--)
             if (i == freq[i]) {
                 result = i;
                 break;
             }
-        }
 
         return result;
     }
