@@ -27,10 +27,11 @@ class Solution {
     public double soupServings(int n) {
         if (n >= 4800)
             return 1;
+            
         double[][] dp = new double[n + 1][n + 1];
-        for (double[] row : dp) {
+        for (double[] row : dp)
             Arrays.fill(row, -1);
-        }
+
         return solve(n, n, dp);
     }
 }
